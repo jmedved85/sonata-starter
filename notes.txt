@@ -1,0 +1,210 @@
+NOTES:
+
+- Install PHP 8.3 or higher and these PHP extensions (which are installed and enabled by default in most PHP 8 installations): Ctype, iconv, PCRE, Session, SimpleXML, and Tokenizer;
+
+- Install Composer, which is used to install PHP packages.
+
+-----------
+SYMFONY CLI
+-----------
+curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+sudo apt install symfony-cli
+
+symfony check:requirements
+
+-------
+SYMFONY
+-------
+- create web app (Symfony version 6.4 LTS)
+symfony new exawiki --version=lts --webapp
+
+- create in current dir
+symfony new . --version=lts --webapp
+symfony new . --version=lts --webapp --no-git
+
+- displays information about the project -
+bin/console about
+
+- symfony server -
+symfony server:start
+symfony server:start -d
+
+- check whether a project's dependencies contain any known security vulnerability -
+symfony check:security
+
+- command that checks security vulnerabilities in the dependencies of the app
+bin/console importmap:audit
+
+------------
+SONATA ADMIN
+------------
+composer require sonata-project/admin-bundle
+composer require sonata-project/doctrine-orm-admin-bundle
+composer require sonata-project/user-bundle
+
+- sonata create admin class
+bin/console make:sonata:admin
+
+- fully qualified model class: App/Entity/User
+
+----------
+MAKE ENTITY
+-----------
+bin/console make:entity
+sh entity-make.sh
+
+-------------
+MAKE DATABASE
+-------------
+bin/console doctrine:database:create
+docker compose exec php bin/console doctrine:database:create
+
+----------
+MIGRATIONS
+----------
+bin/console doctrine:migrations:diff
+sh diff-migrations.sh
+
+bin/console doctrine:migrations:migrate
+sh migrations-migrate.sh
+
+bin/console make:migration
+docker compose exec php bin/console make:migration
+
+bin/console doctrine:schema:validate
+docker compose exec php bin/console doctrine:schema:validate
+
+- list all migrations
+bin/console doctrine:migrations:list
+docker compose exec php bin/console doctrine:migrations:list
+
+- revert of migration
+bin/console doctrine:migrations:execute 'DoctrineMigrations\Version' --down
+docker compose exec php bin/console doctrine:migrations:execute 'DoctrineMigrations\Version' --down
+
+bin/console doctrine:migrations:execute 'DoctrineMigrations\Version' --up
+docker compose exec php bin/console doctrine:migrations:execute 'DoctrineMigrations\Version' --up
+
+- fixtures
+bin/console doctrine:fixtures:load
+docker compose exec php bin/console doctrine:fixtures:load
+
+vendor/bin/doctrine orm:schema-tool:update --dump-sql
+vendor/bin/doctrine orm:schema-tool:update --force
+
+----------
+.env.local
+----------
+DATABASE_URL=mysql://root:jezzExa753@127.0.0.1:3306/sonata-dev
+DATABASE_URL=mysql://root:pass1234@mysql-sonata_starter:3306/sonata_starter_dev
+APP_ENV=dev
+APP_DEBUG=true
+----------
+
+--------------
+USER ADMIN-DEV
+--------------
+
+- pset hashed password
+bin/console security:hash-password
+
+admin-dev
+admin1234
+
+{
+"user": [
+	{
+		"id" : 1,
+		"username" : "admin-dev",
+		"username_canonical" : "admin-dev",
+		"email" : "admin-dev@test.com",
+		"email_canonical" : "admin-dev@test.com",
+		"enabled" : 1,
+		"salt" : "$2y$13$r8W59gyeQkbSoiC7\/r2bae3a5a5mY7jIDQz.Kp0sbZY.1UYATSLDS",
+		"password" : "$2y$13$y6S3EHTHbt1DAmoJZkRUWOEuA7FrTqiwSJFkriimLEo1X8I\/xyKm2",
+		"last_login" : "2024-04-05 10:15:27",
+		"confirmation_token" : null,
+		"password_requested_at" : null,
+		"roles" : "a:2:{i:0;s:17:\"ROLE_SONATA_ADMIN\";i:1;s:16:\"ROLE_SUPER_ADMIN\";}",
+		"created_at" : "2024-05-04 12:04:00",
+		"updated_at" : "2024-04-05 10:15:27"
+	}
+]}
+
+INSERT INTO user
+(id, username, username_canonical, email, email_canonical, enabled, salt, password, last_login, confirmation_token, password_requested_at, roles, created_at, updated_at)
+VALUES
+(1, 'admin-dev', 'admin-dev', 'admin-dev@test.com', 'admin-dev@test.com', 1, '$2y$13$r8W59gyeQkbSoiC7/r2bae3a5a5mY7jIDQz.Kp0sbZY.1UYATSLDS', '$2y$13$y6S3EHTHbt1DAmoJZkRUWOEuA7FrTqiwSJFkriimLEo1X8I/xyKm2', '2024-09-12 00:00:00', NULL, NULL, 'a:2:{i:0;s:17:\"ROLE_SONATA_ADMIN\";i:1;s:16:\"ROLE_SUPER_ADMIN\";}', '2024-09-12 15:00:00', '2024-09-12 00:00:00');
+
+
+------
+ASSETS
+------
+- styles/custom.css
+- app.js (if using importmap)
+
+composer require symfony/asset-mapper
+
+bin/console cache:clear
+sh clear-cache.sh
+
+bin/console assets:install
+docker compose exec php bin/console assets:install
+
+bin/console debug:asset-map
+docker compose exec php bin/console debug:asset-map
+
+bin/console asset-map:compile
+sh asset-map-compile.sh
+
+--------
+PHP-STAN
+--------
+composer require --dev phpstan/phpstan
+vendor/bin/phpstan analyze --memory-limit=1G
+sh phpstan.sh
+
+------------
+PHP-CS-Fixer
+------------
+composer require cs-fixer-shim
+./vendor/bin/php-cs-fixer
+./vendor/bin/php-cs-fixer fix
+
+-----------
+CODESNIFFER
+-----------
+composer require --dev squizlabs/php_codesniffer
+
+vendor/bin/phpcs src
+vendor/bin/phpcbf src
+
+------
+DOCKER
+------
+sh up.sh
+sh down.sh
+sh asset-map-compile.sh
+sh clear-cache.sh
+sh diff-migrations.sh
+sh entity-make.sh
+sh migrations-migrate.sh
+sh router-debug.sh
+sh lint-twig.sh
+sh phpstan.sh
+sh fix.sh
+
+- IMPORTANT!!!
+- use 'docker compose exec php' in front of the 'bin/console' command if app is running in docker
+
+docker compose exec php bin/console cache:clear
+docker compose exec php bin/console make:entity
+docker compose exec php bin/console doctrine:migrations:diff
+docker compose exec php bin/console doctrine:migrations:migrate
+docker compose exec php bin/console asset-map:compile
+
+- mkdir uploads/documents permission
+chmod 777 /home/user/directory/project/anotherdir
+
+- change permissions
+sudo chown user:user security.yaml
