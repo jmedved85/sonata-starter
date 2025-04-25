@@ -22,3 +22,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    Sonata\UserBundle\Model\UserManagerInterface: '@sonata.user.manager.user'
+
+    admin.user:
+        class: App\Admin\UserAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\User, controller: App\Controller\UserAdminController, manager_type: orm, group: admin, label: User }
