@@ -95,7 +95,6 @@ vendor/bin/doctrine orm:schema-tool:update --force
 ----------
 .env.local
 ----------
-DATABASE_URL=mysql://root:jezzExa753@127.0.0.1:3306/sonata-dev
 DATABASE_URL=mysql://root:pass1234@mysql-sonata_starter:3306/sonata_starter_dev
 APP_ENV=dev
 APP_DEBUG=true
